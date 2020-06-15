@@ -15,5 +15,8 @@ jobs:
       - name: Install dependencies
         run: sudo apt install -y pylint
 
+      - name: Look at pylint version
+        run: pylint --version
+
       - name: Run pylint
         run: pylint "$GITHUB_WORKSPACE/base-provisioning-agent/report_ready.py"
