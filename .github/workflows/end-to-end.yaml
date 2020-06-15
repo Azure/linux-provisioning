@@ -8,7 +8,12 @@ jobs:
   test:
     name: Run end to end tests
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: sudo apt install pylint -y
+
       - name: Run pylint
         run: pylint "$GITHUB_WORKSPACE/base-provisioning-agent/*.py"
