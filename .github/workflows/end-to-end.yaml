@@ -12,11 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Troubleshoot pipeline
-        run: echo "$GITHUB_WORKSPACE"
-
       - name: Install dependencies
-        run: sudo apt install pylint -y
+        run: sudo apt install -y pylint tree
+
+      - name: Troubleshoot pipeline
+        run: tree "$GITHUB_WORKSPACE"
 
       - name: Run pylint
         run: pylint "$GITHUB_WORKSPACE/base-provisioning-agent/*.py"
