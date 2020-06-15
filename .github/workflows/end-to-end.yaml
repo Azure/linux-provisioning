@@ -9,7 +9,6 @@ jobs:
     name: Run end to end tests
     runs-on: ubuntu-latest
     steps:
-      - name: First step
-        run: echo first step
-      - name: Second step
-        run: echo second step
+      - uses: actions/checkout@v2
+      - name: Run pylint
+        run: pylint "$GITHUB_WORKSPACE/base-provisioning-agent/*.py"
