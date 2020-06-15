@@ -13,10 +13,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install dependencies
-        run: sudo apt install -y pylint tree
-
-      - name: Troubleshoot pipeline
-        run: tree "$GITHUB_WORKSPACE"
+        run: sudo apt install -y pylint
 
       - name: Run pylint
-        run: pylint "$GITHUB_WORKSPACE/base-provisioning-agent/*.py"
+        run: pylint "$GITHUB_WORKSPACE/base-provisioning-agent/"
