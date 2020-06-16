@@ -24,4 +24,4 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE"
           . venv/bin/activate
-          pylint "$GITHUB_WORKSPACE/base-provisioning-agent/report_ready.py"
+          pylint "$GITHUB_WORKSPACE/base-provisioning-agent/*.py"
