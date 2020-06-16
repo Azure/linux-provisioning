@@ -1,4 +1,4 @@
-name: e2e
+name: Base provisioning agent tests
 on:
   push:
     branches:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    name: Run end to end tests
+    name: Run all tests
     runs-on: ubuntu-latest
 
     steps:
