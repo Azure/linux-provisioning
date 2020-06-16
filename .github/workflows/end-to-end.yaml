@@ -27,5 +27,5 @@ jobs:
           which pylint
           pylint --version
 
-      # - name: Run pylint
-      #   run: pylint "$GITHUB_WORKSPACE/base-provisioning-agent/report_ready.py"
+      - name: Run pylint
+        run: pylint "$GITHUB_WORKSPACE/base-provisioning-agent/report_ready.py"
