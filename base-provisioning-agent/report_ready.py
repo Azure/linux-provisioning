@@ -1,5 +1,8 @@
 """Python module to easily allow for reporting ready to Azure."""
 
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 import http.client
 from xml.etree import ElementTree
 
