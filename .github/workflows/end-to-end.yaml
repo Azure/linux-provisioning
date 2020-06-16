@@ -20,12 +20,8 @@ jobs:
           . venv/bin/activate
           pip install pylint
 
-      - name: Look at pylint version
+      - name: Run pylint
         run: |
           cd "$GITHUB_WORKSPACE"
           . venv/bin/activate
-          which pylint
-          pylint --version
-
-      - name: Run pylint
-        run: pylint "$GITHUB_WORKSPACE/base-provisioning-agent/report_ready.py"
+          pylint "$GITHUB_WORKSPACE/base-provisioning-agent/report_ready.py"
