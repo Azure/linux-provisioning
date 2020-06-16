@@ -13,10 +13,18 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install dependencies
-        run: sudo apt install -y pylint
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          python3 -m venv venv 
+          . venv/bin/activate
+          pip install pylint
 
       - name: Look at pylint version
-        run: pylint --version
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          . venv/bin/activate
+          which pylint
+          pylint --version
 
-      - name: Run pylint
-        run: pylint "$GITHUB_WORKSPACE/base-provisioning-agent/report_ready.py"
+      # - name: Run pylint
+      #   run: pylint "$GITHUB_WORKSPACE/base-provisioning-agent/report_ready.py"
