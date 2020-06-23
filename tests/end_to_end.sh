@@ -4,8 +4,9 @@ set -euo pipefail
 
 RESOURCE_NAME="linuxpa${RANDOM}"
 IMAGE="debian:debian-10:10:latest"
-SSH_KEY_FILE="~/.ssh/linuxparunner"
-SSH_KEY_FILE="${SSH_KEY_FILE/#\~/$HOME}"
+SSH_DIR="~/.ssh"
+SSH_DIR="${SSH_DIR/#\~/$HOME}"
+SSH_KEY_FILE="${SSH_DIR}/linuxparunner"
 SSH_PUB_KEY_FILE="${SSH_KEY_FILE}.pub"
 LOCATION="eastus"
 
@@ -21,6 +22,7 @@ az login \
 az account set --subscription "$AZ_SUBSCRIPTION"
 
 echo "$(date) - Retrieving the SSH key"
+mkdir -p "$SSH_DIR"
 az keyvault secret show \
     --vault-name linuxpa \
     --name linuxpa \
