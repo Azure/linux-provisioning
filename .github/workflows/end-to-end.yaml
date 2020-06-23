@@ -27,4 +27,9 @@ jobs:
           pylint "$GITHUB_WORKSPACE/base-provisioning-agent"
 
       - name: Run end to end tests
+        env:
+          AZ_USERNAME: ${{ secrets.AZ_USERNAME }}
+          AZ_PASSWORD: ${{ secrets.AZ_PASSWORD }}
+          AZ_SUBSCRIPTION: ${{ secrets.AZ_SUBSCRIPTION }}
+          AZ_TENANT: ${{ secrets.AZ_TENANT }}
         run: "$GITHUB_WORKSPACE/tests/end_to_end.sh"
