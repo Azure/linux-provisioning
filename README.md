@@ -20,6 +20,29 @@ If you have decided that you can't use either the walinuxagent or cloud-init for
 
 This boilerplate assumes that you can use python3 (for the report ready script) and systemd (for scheduling and coordinating the provisioning) in your image. If you cannot use either of these, then it is recommended to read and understand the basic code and port it to your platform of choice.
 
+### Running tests locally
+
+If you want to run the end-to-end tests that the CI pipeline runs, you need to first setup your environment and SSH key:
+
+```
+$ ./tests/ssh_key_setup.sh
+```
+
+This will create `~/.ssh/linuxpa` and `~/.ssh/linuxpa.pub` key pair if it doesn't exist. Then in your current subscription (`az account show`) it will create (if it doesn't exist) a resource group named `linuxpa`, a key vault named `linuxpa` and then upload the private key to a key vault secret.
+
+This key is retrieved in `tests/end_to_end.sh` to ensure that the runner (or in the case of running locally, your local machine) can SSH into the target VMs to validate.
+
+Then to run the tests, you can do the following:
+
+```
+$ GITHUB_WORKSPACE=<local_repo_path> \
+    AZ_USERNAME="<sp_id>" \
+    AZ_PASSWORD="<sp_secret>" \
+    AZ_TENANT="<tenant_id>" \
+    AZ_SUBSCRIPTION="<subscription_id>" \
+    ./tests/end_to_end.sh
+```
+
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a

@@ -2,6 +2,7 @@
 
 set -euo pipefail
 
+RESOURCE_GROUP_TAG="linuxpa=test"
 RESOURCE_NAME="linuxpa${RANDOM}"
 IMAGE="debian:debian-10:10:latest"
 SSH_DIR="~/.ssh"
@@ -33,7 +34,8 @@ ssh-keygen -y -f "$SSH_KEY_FILE" > "$SSH_PUB_KEY_FILE"
 echo "$(date) - Creating the resource group"
 az group create \
     --location "$LOCATION" \
-    --name "$RESOURCE_NAME"
+    --name "$RESOURCE_NAME" \
+    --tags "$RESOURCE_GROUP_TAG"
 
 echo "$(date) - Creating the network security group"
 az network nsg create \
