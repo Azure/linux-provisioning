@@ -1,4 +1,4 @@
-name: Base provisioning agent tests
+name: Base provisioning agent
 on:
   push:
     branches:
