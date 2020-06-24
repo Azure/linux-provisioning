@@ -36,3 +36,4 @@ jobs:
 
       - name: Cleanup resources
         if: ${{ always() }}
+        run: "$GITHUB_WORKSPACE/tests/cleanup.sh"
