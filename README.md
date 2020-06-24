@@ -43,6 +43,16 @@ $ GITHUB_WORKSPACE=<local_repo_path> \
     ./tests/end_to_end.sh
 ```
 
+To cleanup resources:
+
+```
+$ AZ_USERNAME="<sp_id>" \
+    AZ_PASSWORD="<sp_secret>" \
+    AZ_TENANT="<tenant_id>" \
+    AZ_SUBSCRIPTION="<subscription_id>" \
+    ./tests/cleanup.sh
+```
+
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a

@@ -33,3 +33,6 @@ jobs:
           AZ_SUBSCRIPTION: ${{ secrets.AZ_SUBSCRIPTION }}
           AZ_TENANT: ${{ secrets.AZ_TENANT }}
         run: "$GITHUB_WORKSPACE/tests/end_to_end.sh"
+
+      - name: Cleanup resources
+        if: ${{ always() }}
