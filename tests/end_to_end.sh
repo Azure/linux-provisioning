@@ -168,4 +168,46 @@ if [[ "$RESULT" != "Result=success" ]]; then
     exit 1
 fi
 
+JOURNAL_LOGS=$(ssh \
+    -i "$SSH_KEY_FILE" \
+    -o StrictHostKeyChecking=no \
+    "${NEW_RESOURCE_NAME}.${LOCATION}.cloudapp.azure.com" \
+    "sudo journalctl -u azure-provisioning.service")
+echo "$(date) - Dumping journal logs to validate provisioning complete"
+echo "$JOURNAL_LOGS"
+if [[ ! "$JOURNAL_LOGS" == *"Provisioning complete"* ]]; then
+    echo "$(date) - No provisioning complete log message"
+    exit 1
+fi
+
+echo "$(date) - Rebooting VM to validate the no provisioning scenario"
+ssh \
+    -i "$SSH_KEY_FILE" \
+    -o StrictHostKeyChecking=no \
+    "${NEW_RESOURCE_NAME}.${LOCATION}.cloudapp.azure.com" \
+    "sudo reboot"
+sleep 120
+RESULT=$(ssh \
+    -i "$SSH_KEY_FILE" \
+    -o StrictHostKeyChecking=no \
+    "${NEW_RESOURCE_NAME}.${LOCATION}.cloudapp.azure.com" \
+    "systemctl show --property Result azure-provisioning.service")
+echo "$(date) - Provisioning unit result: '$RESULT'"
+if [[ "$RESULT" != "Result=success" ]]; then
+    echo "$(date) - Failed second boot with bad result"
+    exit 1
+fi
+
+JOURNAL_LOGS=$(ssh \
+    -i "$SSH_KEY_FILE" \
+    -o StrictHostKeyChecking=no \
+    "${NEW_RESOURCE_NAME}.${LOCATION}.cloudapp.azure.com" \
+    "sudo journalctl -u azure-provisioning.service")
+echo "$(date) - Dumping journal logs to validate no provisioning"
+echo "$JOURNAL_LOGS"
+if [[ ! "$JOURNAL_LOGS" == *"Matching vmIds, not running provisioning"* ]]; then
+    echo "$(date) - Expected provisioning not to run"
+    exit 1
+fi
+
 echo "$(date) - All tests succeeded"
