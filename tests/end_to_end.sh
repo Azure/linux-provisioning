@@ -163,7 +163,7 @@ RESULT=$(ssh \
     "${NEW_RESOURCE_NAME}.${LOCATION}.cloudapp.azure.com" \
     "systemctl show --property Result azure-provisioning.service")
 echo "$(date) - Provisioning unit result: '$RESULT'"
-if [[ "$RESULT" != "Result=success" ]]; then
+if [[ "$RESULT" != "Result=notsuccess" ]]; then
     echo "$(date) - Failed provisioning with bad result"
     exit 1
 fi
