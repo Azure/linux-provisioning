@@ -31,6 +31,11 @@ az keyvault secret show \
 chmod 600 "$SSH_KEY_FILE"
 ssh-keygen -y -f "$SSH_KEY_FILE" > "$SSH_PUB_KEY_FILE"
 
+##################################################
+#                                                #            
+#              Base VM creation                  #
+#                                                #            
+##################################################
 echo "$(date) - Creating the resource group"
 az group create \
     --location "$LOCATION" \
@@ -142,6 +147,11 @@ az vm delete \
     --name "$RESOURCE_NAME" \
     --yes
 
+##################################################
+#                                                #            
+#              Initial VM with new PA            #
+#                                                #            
+##################################################
 NEW_RESOURCE_NAME="${RESOURCE_NAME}new"
 echo "$(date) - Creating VM from image"
 az vm create \
@@ -235,6 +245,11 @@ az vm delete \
     --name "$NEW_RESOURCE_NAME" \
     --yes
 
+##################################################
+#                                                #            
+#              Second VM with new PA             #
+#                                                #            
+##################################################
 NEWER_RESOURCE_NAME="${RESOURCE_NAME}newer"
 echo "$(date) - Creating VM from image"
 az vm create \
