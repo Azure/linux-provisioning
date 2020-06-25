@@ -210,4 +210,101 @@ if [[ ! "$JOURNAL_LOGS" == *"Matching vmIds, not running provisioning"* ]]; then
     exit 1
 fi
 
+echo "$(date) - Testing image based off of base provisioning agent VM"
+
+echo "$(date) - Creating image from base provisioning agent VM"
+az vm deallocate \
+    --resource-group "$RESOURCE_NAME" \
+    --name "$NEW_RESOURCE_NAME"
+az vm generalize \
+    --resource-group "$RESOURCE_NAME" \
+    --name "$NEW_RESOURCE_NAME"
+az image create \
+    --resource-group "$RESOURCE_NAME" \
+    --source "$NEW_RESOURCE_NAME" \
+    --location "$LOCATION" \
+    --name "$NEW_RESOURCE_NAME"
+IMAGE_ID=$(az image show \
+    --resource-group "$RESOURCE_NAME" \
+    --name "$NEW_RESOURCE_NAME" \
+    --query id -o tsv)
+
+echo "$(date) - Deleting base VM"
+az vm delete \
+    --resource-group "$RESOURCE_NAME" \
+    --name "$NEW_RESOURCE_NAME" \
+    --yes
+
+NEWER_RESOURCE_NAME="${RESOURCE_NAME}newer"
+echo "$(date) - Creating VM from image"
+az vm create \
+    --resource-group "$RESOURCE_NAME" \
+    --name "$NEWER_RESOURCE_NAME" \
+    --location "$LOCATION" \
+    --ssh-key-value "$SSH_PUB_KEY_FILE" \
+    --public-ip-address-dns-name "$NEWER_RESOURCE_NAME" \
+    --image "$IMAGE_ID" \
+    --vnet-name "$RESOURCE_NAME" \
+    --subnet "$RESOURCE_NAME" \
+    --nsg "$RESOURCE_NAME" \
+    --enable-agent false
+
+echo "$(date) - Validating provisioning"
+RESULT=$(ssh \
+    -i "$SSH_KEY_FILE" \
+    -o StrictHostKeyChecking=no \
+    "${NEWER_RESOURCE_NAME}.${LOCATION}.cloudapp.azure.com" \
+    "systemctl show --property Result azure-provisioning.service")
+echo "$(date) - Provisioning unit result: '$RESULT'"
+if [[ "$RESULT" != "Result=success" ]]; then
+    echo "$(date) - Failed provisioning with bad result"
+    exit 1
+fi
+
+JOURNAL_LOGS=$(ssh \
+    -i "$SSH_KEY_FILE" \
+    -o StrictHostKeyChecking=no \
+    "${NEWER_RESOURCE_NAME}.${LOCATION}.cloudapp.azure.com" \
+    "sudo journalctl -u azure-provisioning.service")
+echo "$(date) - Dumping journal logs to validate provisioning complete"
+echo "$JOURNAL_LOGS"
+if [[ ! "$JOURNAL_LOGS" == *"Provisioning complete"* ]]; then
+    echo "$(date) - No provisioning complete log message"
+    exit 1
+fi
+if [[ ! "$JOURNAL_LOGS" == *"vmId does not match, running provisioning"* ]]; then
+    echo "$(date) - No vmId mismatch message"
+    exit 1
+fi
+
+echo "$(date) - Rebooting VM to validate the no provisioning scenario"
+ssh \
+    -i "$SSH_KEY_FILE" \
+    -o StrictHostKeyChecking=no \
+    "${NEWER_RESOURCE_NAME}.${LOCATION}.cloudapp.azure.com" \
+    "sudo reboot"
+sleep 120
+RESULT=$(ssh \
+    -i "$SSH_KEY_FILE" \
+    -o StrictHostKeyChecking=no \
+    "${NEWER_RESOURCE_NAME}.${LOCATION}.cloudapp.azure.com" \
+    "systemctl show --property Result azure-provisioning.service")
+echo "$(date) - Provisioning unit result: '$RESULT'"
+if [[ "$RESULT" != "Result=success" ]]; then
+    echo "$(date) - Failed second boot with bad result"
+    exit 1
+fi
+
+JOURNAL_LOGS=$(ssh \
+    -i "$SSH_KEY_FILE" \
+    -o StrictHostKeyChecking=no \
+    "${NEWER_RESOURCE_NAME}.${LOCATION}.cloudapp.azure.com" \
+    "sudo journalctl -u azure-provisioning.service")
+echo "$(date) - Dumping journal logs to validate no provisioning"
+echo "$JOURNAL_LOGS"
+if [[ ! "$JOURNAL_LOGS" == *"Matching vmIds, not running provisioning"* ]]; then
+    echo "$(date) - Expected provisioning not to run"
+    exit 1
+fi
+
 echo "$(date) - All tests succeeded"
