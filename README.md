@@ -32,6 +32,8 @@ This will create `~/.ssh/linuxpa` and `~/.ssh/linuxpa.pub` key pair if it doesn'
 
 This key is retrieved in `tests/end_to_end.sh` to ensure that the runner (or in the case of running locally, your local machine) can SSH into the target VMs to validate.
 
+The end to end testing reuses a resource group named `linuxpa-testing`.
+
 Then to run the tests, you can do the following:
 
 ```
