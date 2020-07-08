@@ -11,7 +11,7 @@ az login \
     --service-principal \
     --username "$AZ_USERNAME" \
     --password "$AZ_PASSWORD" \
-    --tenant "$AZ_TENANT"
+    --tenant "$AZ_TENANT" > /dev/null
 az account set --subscription "$AZ_SUBSCRIPTION"
 
 az vm list \
