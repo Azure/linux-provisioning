@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-RESOURCE_GROUP_TAG="linuxpa=test"
+RESOURCE_GROUP_NAME="linuxpa-testing"
 RESOURCE_NAME="linuxpa${RANDOM}"
 IMAGE="debian:debian-10:10:latest"
 SSH_DIR="~/.ssh"
@@ -31,23 +31,17 @@ az keyvault secret show \
 chmod 600 "$SSH_KEY_FILE"
 ssh-keygen -y -f "$SSH_KEY_FILE" > "$SSH_PUB_KEY_FILE"
 
-echo "$(date) - Creating the resource group"
-az group create \
-    --location "$LOCATION" \
-    --name "$RESOURCE_NAME" \
-    --tags "$RESOURCE_GROUP_TAG"
-
 echo "$(date) - Creating the network security group"
 az network nsg create \
     --name "$RESOURCE_NAME" \
-    --resource-group "$RESOURCE_NAME"
+    --resource-group "$RESOURCE_GROUP_NAME"
 
 echo "$(date) - Creating network security group rule"
 az network nsg rule create \
     --name "$RESOURCE_NAME" \
     --nsg-name "$RESOURCE_NAME" \
     --priority 100 \
-    --resource-group "$RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP_NAME" \
     --access Allow \
     --direction Inbound \
     --source-address-prefixes $(curl ipinfo.io/ip) \
@@ -56,22 +50,22 @@ az network nsg rule create \
 echo "$(date) - Creating vnet"
 az network vnet create \
     --name "$RESOURCE_NAME" \
-    --resource-group "$RESOURCE_NAME"
+    --resource-group "$RESOURCE_GROUP_NAME"
 
 echo "$(date) - Creating subnet"
 az network vnet subnet create \
     --name "$RESOURCE_NAME" \
     --vnet-name "$RESOURCE_NAME" \
-    --resource-group "$RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP_NAME" \
     --address-prefixes "10.0.0.0/24" \
     --network-security-group $(az network nsg show \
-        --resource-group "$RESOURCE_NAME" \
+        --resource-group "$RESOURCE_GROUP_NAME" \
         --name "$RESOURCE_NAME" --query id -o tsv)
 
 echo "$(date) - Creating the base VM"
 az vm create \
     --name "$RESOURCE_NAME" \
-    --resource-group "$RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP_NAME" \
     --location "$LOCATION" \
     --ssh-key-value "$SSH_PUB_KEY_FILE" \
     --public-ip-address-dns-name "$RESOURCE_NAME" \
@@ -121,31 +115,31 @@ ssh \
 
 echo "$(date) - Creating image from base VM"
 az vm deallocate \
-    --resource-group "$RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP_NAME" \
     --name "$RESOURCE_NAME"
 az vm generalize \
-    --resource-group "$RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP_NAME" \
     --name "$RESOURCE_NAME"
 az image create \
-    --resource-group "$RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP_NAME" \
     --source "$RESOURCE_NAME" \
     --location "$LOCATION" \
     --name "$RESOURCE_NAME"
 IMAGE_ID=$(az image show \
-    --resource-group "$RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP_NAME" \
     --name "$RESOURCE_NAME" \
     --query id -o tsv)
 
 echo "$(date) - Deleting base VM"
 az vm delete \
-    --resource-group "$RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP_NAME" \
     --name "$RESOURCE_NAME" \
     --yes
 
 NEW_RESOURCE_NAME="${RESOURCE_NAME}new"
 echo "$(date) - Creating VM from image"
 az vm create \
-    --resource-group "$RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP_NAME" \
     --name "$NEW_RESOURCE_NAME" \
     --location "$LOCATION" \
     --ssh-key-value "$SSH_PUB_KEY_FILE" \
@@ -214,31 +208,31 @@ echo "$(date) - Testing image based off of base provisioning agent VM"
 
 echo "$(date) - Creating image from base provisioning agent VM"
 az vm deallocate \
-    --resource-group "$RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP_NAME" \
     --name "$NEW_RESOURCE_NAME"
 az vm generalize \
-    --resource-group "$RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP_NAME" \
     --name "$NEW_RESOURCE_NAME"
 az image create \
-    --resource-group "$RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP_NAME" \
     --source "$NEW_RESOURCE_NAME" \
     --location "$LOCATION" \
     --name "$NEW_RESOURCE_NAME"
 IMAGE_ID=$(az image show \
-    --resource-group "$RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP_NAME" \
     --name "$NEW_RESOURCE_NAME" \
     --query id -o tsv)
 
 echo "$(date) - Deleting base VM"
 az vm delete \
-    --resource-group "$RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP_NAME" \
     --name "$NEW_RESOURCE_NAME" \
     --yes
 
 NEWER_RESOURCE_NAME="${RESOURCE_NAME}newer"
 echo "$(date) - Creating VM from image"
 az vm create \
-    --resource-group "$RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP_NAME" \
     --name "$NEWER_RESOURCE_NAME" \
     --location "$LOCATION" \
     --ssh-key-value "$SSH_PUB_KEY_FILE" \
