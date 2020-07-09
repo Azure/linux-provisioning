@@ -10,7 +10,7 @@ This is the least amount of work that a provisioning agent has to do to bring a 
 
 ### Have a question or problem?
 
-Just open up a GitHub issue on this repro!
+Just open up a [GitHub issue on this repro](https://github.com/Azure/linux-provisioning/issues)!
 
 ### What can you do with this?
 
