@@ -8,6 +8,10 @@
 
 This is the least amount of work that a provisioning agent has to do to bring a VM up in Azure. This is meant to provide users with an alternative to other supported provisioning agents in Azure Linux VMs ([walinuxagent](https://github.com/Azure/WALinuxAgent) and [cloud-init](https://github.com/canonical/cloud-init)).
 
+### Have a question or problem?
+
+Just open up a GitHub issue on this repro!
+
 ### What can you do with this?
 
 Use it as-is, or fork/clone it and develop your own provisioning agent on top of the existing code/boilerplate.
