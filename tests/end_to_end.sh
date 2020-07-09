@@ -190,7 +190,7 @@ ssh \
     -o StrictHostKeyChecking=no \
     "${NEW_RESOURCE_NAME}.${LOCATION}.cloudapp.azure.com" \
     "sudo reboot"
-sleep 120
+sleep 300
 RESULT=$(ssh \
     -i "$SSH_KEY_FILE" \
     -o StrictHostKeyChecking=no \
@@ -292,7 +292,7 @@ ssh \
     -o StrictHostKeyChecking=no \
     "${NEWER_RESOURCE_NAME}.${LOCATION}.cloudapp.azure.com" \
     "sudo reboot"
-sleep 120
+sleep 300
 RESULT=$(ssh \
     -i "$SSH_KEY_FILE" \
     -o StrictHostKeyChecking=no \
